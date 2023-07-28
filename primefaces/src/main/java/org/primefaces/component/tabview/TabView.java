@@ -105,55 +105,66 @@ public class TabView extends TabViewBase {
         FacesContext context = getFacesContext();
 
         if (ComponentUtils.isRequestSource(this, context) && event instanceof AjaxBehaviorEvent) {
-            Map<String, String> params = context.getExternalContext().getRequestParameterMap();
-            String eventName = params.get(Constants.RequestParams.PARTIAL_BEHAVIOR_EVENT_PARAM);
-            String clientId = getClientId(context);
-            boolean repeating = isRepeating();
-            AjaxBehaviorEvent behaviorEvent = (AjaxBehaviorEvent) event;
-
-            if ("tabChange".equals(eventName)) {
-                String tabClientId = params.get(clientId + "_newTab");
-                TabChangeEvent changeEvent = new TabChangeEvent(this, behaviorEvent.getBehavior(), findTab(tabClientId));
-
-                if (repeating) {
-                    int tabindex = Integer.parseInt(params.get(clientId + "_tabindex"));
-                    setIndex(tabindex);
-                    changeEvent.setData(getIndexData());
-                    changeEvent.setTab(getDynamicTab());
-                }
-
-                changeEvent.setPhaseId(behaviorEvent.getPhaseId());
-
-                super.queueEvent(changeEvent);
-
-                if (repeating) {
-                    setIndex(-1);
-                }
-            }
-            else if ("tabClose".equals(eventName)) {
-                String tabClientId = params.get(clientId + "_closeTab");
-                TabCloseEvent closeEvent = new TabCloseEvent(this, behaviorEvent.getBehavior(), findTab(tabClientId));
-
-                if (repeating) {
-                    int tabindex = Integer.parseInt(params.get(clientId + "_tabindex"));
-                    setIndex(tabindex);
-                    closeEvent.setData(getIndexData());
-                    closeEvent.setTab(getDynamicTab());
-                }
-
-                closeEvent.setPhaseId(behaviorEvent.getPhaseId());
-
-                super.queueEvent(closeEvent);
-
-                if (repeating) {
-                    setIndex(-1);
-                }
-            }
+            processAjaxBehaviorEvent((AjaxBehaviorEvent) event);
         }
         else {
             super.queueEvent(event);
         }
     }
+
+    private void processAjaxBehaviorEvent(AjaxBehaviorEvent behaviorEvent) {
+        FacesContext context = getFacesContext();
+        Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+        String eventName = params.get(Constants.RequestParams.PARTIAL_BEHAVIOR_EVENT_PARAM);
+        String clientId = getClientId(context);
+        boolean repeating = isRepeating();
+
+        if ("tabChange".equals(eventName)) {
+            handleTabChangeEvent(behaviorEvent, params, clientId, repeating);
+        }
+        else if ("tabClose".equals(eventName)) {
+            handleTabCloseEvent(behaviorEvent, params, clientId, repeating);
+        }
+    }
+
+    private void handleTabChangeEvent(AjaxBehaviorEvent behaviorEvent, Map<String, String> params, String clientId, boolean repeating) {
+        String tabClientId = params.get(clientId + "_newTab");
+        TabChangeEvent changeEvent = new TabChangeEvent(this, behaviorEvent.getBehavior(), findTab(tabClientId));
+
+        if (repeating) {
+            int tabindex = Integer.parseInt(params.get(clientId + "_tabindex"));
+            setIndex(tabindex);
+            changeEvent.setData(getIndexData());
+            changeEvent.setTab(getDynamicTab());
+        }
+
+        changeEvent.setPhaseId(behaviorEvent.getPhaseId());
+        super.queueEvent(changeEvent);
+
+        if (repeating) {
+            setIndex(-1);
+        }
+    }
+
+    private void handleTabCloseEvent(AjaxBehaviorEvent behaviorEvent, Map<String, String> params, String clientId, boolean repeating) {
+        String tabClientId = params.get(clientId + "_closeTab");
+        TabCloseEvent closeEvent = new TabCloseEvent(this, behaviorEvent.getBehavior(), findTab(tabClientId));
+
+        if (repeating) {
+            int tabindex = Integer.parseInt(params.get(clientId + "_tabindex"));
+            setIndex(tabindex);
+            closeEvent.setData(getIndexData());
+            closeEvent.setTab(getDynamicTab());
+        }
+
+        closeEvent.setPhaseId(behaviorEvent.getPhaseId());
+        super.queueEvent(closeEvent);
+
+        if (repeating) {
+            setIndex(-1);
+        }
+    }
+
 
     protected void resetActiveIndex() {
         getStateHelper().remove(PropertyKeys.activeIndex);

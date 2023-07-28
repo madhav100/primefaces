@@ -40,18 +40,34 @@ public class PrimeFlexMigration extends AbstractPrimeMigration implements Runnab
         System.exit(exitCode);
     }
 
+
     @Override
     protected void initReplaceRegEx() {
-        // see https://www.primefaces.org/primeflex/migration
+        initSpacingRegex();
+        initGridRegex();
+        initDisplayRegex();
+        initFlexBoxRegex();
+        initTextRegex();
+        initElevationRegex();
+        initFormLayoutRegex();
+        initSpecialLookAheadRegex();
+    }
+    private void addToMap(String key, String value) {
+        replaceRegex.put(key, value);
+    }
 
-        // spacing
-        replaceRegex.put("p-(m|p)(t|b|l|r|x|y)-(xl|lg|md|sm)-(0|1|2|3|4|5|6|auto)", "$3:$1$2-$4");
-        replaceRegex.put("p-(m|p)-(xl|lg|md|sm)-(0|1|2|3|4|5|6|auto)", "$2:$1-$3");
-        replaceRegex.put("p-p-(xl|lg|md|sm)-(0|1|2|3|4|5|6|auto)", "$1:p-$2");
-        replaceRegex.put("p-(m|p)(t|b|l|r|x|y)-(0|1|2|3|4|5|6|auto)", "$1$2-$3");
-        replaceRegex.put("p-(m|p)-(0|1|2|3|4|5|6|auto)", "$1-$2");
+    protected void initSpacingRegex() {
+        addToMap("p-(m|p)(t|b|l|r|x|y)-(xl|lg|md|sm)-(0|1|2|3|4|5|6|auto)", "$3:$1$2-$4");
+        addToMap("p-(m|p)-(xl|lg|md|sm)-(0|1|2|3|4|5|6|auto)", "$2:$1-$3");
+        addToMap("p-p-(xl|lg|md|sm)-(0|1|2|3|4|5|6|auto)", "$1:p-$2");
+        addToMap("p-(m|p)(t|b|l|r|x|y)-(0|1|2|3|4|5|6|auto)", "$1$2-$3");
+        addToMap("p-(m|p)-(0|1|2|3|4|5|6|auto)", "$1-$2");
+    }
 
-        // grid
+
+
+    protected void initGridRegex() {
+       // grid
         replaceRegex.put("p-grid", "grid");
         replaceRegex.put("p-nogutter", "grid-nogutter");
         replaceRegex.put("p-col-([0-9]+?)", "col-$1");
@@ -77,6 +93,11 @@ public class PrimeFlexMigration extends AbstractPrimeMigration implements Runnab
         replaceRegex.put("p-(xl|lg|md|sm)-order-(9|10)", "$1:flex-order-5");
         replaceRegex.put("p-(xl|lg|md|sm)-order-(11|12|last)", "$1:flex-order-6");
 
+
+
+    }
+
+    protected void initDisplayRegex() {
         // display
         replaceRegex.put("p-d-none", "hidden");
         replaceRegex.put("p-d-inline", "inline");
@@ -92,6 +113,11 @@ public class PrimeFlexMigration extends AbstractPrimeMigration implements Runnab
         replaceRegex.put("p-d-(xl|lg|md|sm)-flex", "$1:flex");
         replaceRegex.put("p-d-(xl|lg|md|sm)-inline-flex", "$1:inline-flex");
 
+
+
+    }
+
+    protected void initFlexBoxRegex() {
         // flexbox
         replaceRegex.put("p-flex-row|p-dir-row", "flex-row");
         replaceRegex.put("p-flex-column|p-dir-col", "flex-column");
@@ -164,6 +190,9 @@ public class PrimeFlexMigration extends AbstractPrimeMigration implements Runnab
         replaceRegex.put("p-ac-(xl|lg|md|sm)-around", "$1:align-content-around");
         replaceRegex.put("p-ac-(xl|lg|md|sm)-between", "$1:align-content-between");
 
+    }
+
+    protected void initTextRegex() {
         // text
         replaceRegex.put("p-text-right", "text-right");
         replaceRegex.put("p-text-center", "text-center");
@@ -178,6 +207,9 @@ public class PrimeFlexMigration extends AbstractPrimeMigration implements Runnab
         replaceRegex.put("p-text-nowrap", "white-space-nowrap");
         replaceRegex.put("p-text-truncate", "overflow-hidden white-space-nowrap text-overflow-ellipsis");
 
+    }
+
+    protected void initElevationRegex() {
         // elevation
         replaceRegex.put("p-shadow-(1|2|3)", "shadow-1");
         replaceRegex.put("p-shadow-(4|5|6)", "shadow-2");
@@ -187,17 +219,19 @@ public class PrimeFlexMigration extends AbstractPrimeMigration implements Runnab
         replaceRegex.put("p-shadow-(16|17|18)", "shadow-6");
         replaceRegex.put("p-shadow-(19|20|21)", "shadow-7");
         replaceRegex.put("p-shadow-(21|22|23)", "shadow-8");
+    }
 
+    protected void initFormLayoutRegex() {
         // form layout
         replaceRegex.put("p-formgrid", "formgrid");
         replaceRegex.put("p-formgroup-inline", "formgroup-inline");
         replaceRegex.put("p-field-checkbox", "field-checkbox");
         replaceRegex.put("p-field-radiobutton", "field-radiobutton");
+    }
 
+    protected void initSpecialLookAheadRegex() {
         // special look ahead type regexes
         replaceRegex.put("(?!\\<\\s*p-col|p-col\\w)p-col", "col");
         replaceRegex.put("(?!\\<\\s*p-field|p-field\\w)p-field", "field");
-
-        // complete?
     }
 }

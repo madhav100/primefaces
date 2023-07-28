@@ -265,6 +265,14 @@ public class ScheduleJava8View implements Serializable {
     }
 
     public void addEvent() {
+        // Move the logic for processing the event to a separate method
+        processEvent();
+
+        // Reset the event for the next addition
+        event = new DefaultScheduleEvent<>();
+    }
+
+    private void processEvent() {
         if (event.isAllDay()) {
             // see https://github.com/primefaces/primefaces/issues/1164
             if (event.getStartDate().toLocalDate().equals(event.getEndDate().toLocalDate())) {
@@ -278,9 +286,8 @@ public class ScheduleJava8View implements Serializable {
         else {
             eventModel.updateEvent(event);
         }
-
-        event = new DefaultScheduleEvent<>();
     }
+
 
     public void onEventSelect(SelectEvent<ScheduleEvent<?>> selectEvent) {
         event = selectEvent.getObject();

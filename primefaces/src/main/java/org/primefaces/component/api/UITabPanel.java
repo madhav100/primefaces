@@ -76,7 +76,7 @@ public class UITabPanel extends UIPanel implements NamingContainer {
      * Key: parentClientId (aka rowId when nested within a parent table) Value: DataModel
      */
     private Map<String, DataModel> _dataModelMap = new HashMap<>();
-    private Object _initialDescendantComponentState;
+    private Object initDescComponentState;
     // will be set to false if the data should not be refreshed at the beginning of the encode phase
     private boolean _isValidChilds = true;
     private int _end = -1;
@@ -601,19 +601,19 @@ public class UITabPanel extends UIPanel implements NamingContainer {
         FacesContext facesContext = getFacesContext();
 
         if (_index == -1) {
-            if (_initialDescendantComponentState == null) {
+            if (initDescComponentState == null) {
                 // Create a template that can be used to initialise any row
                 // that we haven't visited before, ie a "saved state" that can
                 // be pushed to the "restoreState" method of all the child
                 // components to set them up to represent a clean row.
-                _initialDescendantComponentState = saveDescendantComponentStates(this, true, true);
+                initDescComponentState = saveDescendantComponentStates(this, true, true);
             }
         }
         else {
             // If no initial component state, there are no EditableValueHolder instances,
             // and that means there is no state to be saved for the current row, so we can
             // skip row state saving code safely.
-            if (_initialDescendantComponentState != null) {
+            if (initDescComponentState != null) {
                 // We are currently positioned on some row, and are about to
                 // move off it, so save the (partial) state of the components
                 // representing the current row. Later if this row is revisited
@@ -646,8 +646,8 @@ public class UITabPanel extends UIPanel implements NamingContainer {
         if (_index == -1) {
             // reset components to initial state
             // If no initial state, skip row restore state code
-            if (_initialDescendantComponentState != null) {
-                restoreDescendantComponentStates(this, true, _initialDescendantComponentState, true);
+            if (initDescComponentState != null) {
+                restoreDescendantComponentStates(this, true, initDescComponentState, true);
             }
             else {
                 restoreDescendantComponentWithoutRestoreState(this, true, true);
@@ -660,8 +660,8 @@ public class UITabPanel extends UIPanel implements NamingContainer {
                 // configure the child components of this component with
                 // the standard "initial" state
                 // If no initial state, skip row restore state code
-                if (_initialDescendantComponentState != null) {
-                    restoreDescendantComponentStates(this, true, _initialDescendantComponentState, true);
+                if (initDescComponentState != null) {
+                    restoreDescendantComponentStates(this, true, initDescComponentState, true);
                 }
                 else {
                     restoreDescendantComponentWithoutRestoreState(this, true, true);
@@ -1262,7 +1262,7 @@ public class UITabPanel extends UIPanel implements NamingContainer {
 
     @Override
     public void encodeBegin(FacesContext context) throws IOException {
-        _initialDescendantComponentState = null;
+        initDescComponentState = null;
         if (_isValidChilds && !hasErrorMessages(context)) {
             // Clear the data model so that when rendering code calls
             // getDataModel a fresh model is fetched from the backing
